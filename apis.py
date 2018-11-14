@@ -2,15 +2,63 @@ from __future__ import print_function
 from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
+import requests
+import datetime
+from bs4 import BeautifulSoup
+
+monthsMap = {
+ 'March': 3,
+ 'February': 2,
+ 'August': 8,
+ 'September': 9,
+ 'April': 4,
+ 'June': 6,
+ 'July': 7,
+ 'January': 1,
+ 'May': 5,
+ 'November': 11,
+ 'December': 12,
+ 'October': 10
+ }
+
+def getHTML(url):
+    req = requests.get(url)
+
+    if r.status_code == 200:
+        return req.content
+    else:
+        print('Error from request to ' + str(url))
+        return
+
+def getDateFromString(dateString):
+
+    splitString = dateString.split(' ')
+    month       = monthsMap[splitString[0]]
+    day         = int(splitString[1].replace(',', ''))
+    year        = int(splitString[2])
+    time        = splitString[4]
+    hour        = int(time.split(':')[0])
+    minutes     = time.split(':')[1]
+
+    if 'PM' in minutes:
+        amPm    = 'PM'
+        minutes = int(minutes.replace('PM', ''))
+    else:
+        amPm    = 'AM'
+        minutes = int(minutes.replace('AM', ''))
+
+    dateTime = datetime.datetime(year, month, day, hour, minutes, 0, 0)
+    return dateTime
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
 
 # The ID and range of a sample spreadsheet.
 SAMPLE_SPREADSHEET_ID = '1EDKCtVAOoYPsfhGND-_IqhvXpAq4I2d5T6UErGcCKTg'
-SAMPLE_RANGE_NAME = 'Sheet1!A1:D5'
+SAMPLE_RANGE_NAME = 'Sheet1'
 
 def main():
+    
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
@@ -30,15 +78,10 @@ def main():
                                 range=SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
 
-    print (values)
-
     if not values:
         print('No data found.')
     else:
-        print('Name, Major:')
-        for row in values:
-            # Print columns A and E, which correspond to indices 0 and 4.
-            print('%s, %s' % (row[0], row[4]))
+        return values
 
 if __name__ == '__main__':
     main()

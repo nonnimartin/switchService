@@ -58,10 +58,8 @@ SAMPLE_SPREADSHEET_ID = '1EDKCtVAOoYPsfhGND-_IqhvXpAq4I2d5T6UErGcCKTg'
 SAMPLE_RANGE_NAME = 'Sheet1'
 
 def main():
-    
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
+
+    #handle oAuth for Google Sheet
     store = file.Storage('token.json')
     creds = store.get()
     if not creds or creds.invalid:

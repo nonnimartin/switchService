@@ -26,7 +26,7 @@ monthsMap = {
 def getHTML(url):
     req = requests.get(url)
 
-    if r.status_code == 200:
+    if req.status_code == 200:
         return req.content
     else:
         print('Error from request to ' + str(url))
@@ -44,7 +44,7 @@ def readDateFromXML(xmlFile):
     for child in tree.iter(tag='lastDate'):
         return(child.text)
 
-def getMaxDateRow(rowsList):
+def getMaxDateRowUrl(rowsList):
     maxDateIndex = 0
     maxDate      = datetime.datetime(1970, 1, 1, 1, 1)
     for row in rowsList:
@@ -55,7 +55,7 @@ def getMaxDateRow(rowsList):
                 maxDate = thisDate
         maxDateIndex += 1
 
-    return rowsList[maxDateIndex - 1]
+    return rowsList[maxDateIndex - 1][2]
 
 
 def getDateFromString(dateString):
@@ -105,7 +105,7 @@ def main():
         print('No data found.')
     else:
         #return values
-        print(values)
+        print(getHTML(getMaxDateRowUrl(values)))
 
 if __name__ == '__main__':
     main()

@@ -4,6 +4,8 @@ from httplib2 import Http
 from oauth2client import file, client, tools
 import requests
 import datetime
+import xml.etree.cElementTree as ET
+import xml.etree.ElementTree
 from bs4 import BeautifulSoup
 
 monthsMap = {
@@ -29,6 +31,32 @@ def getHTML(url):
     else:
         print('Error from request to ' + str(url))
         return
+
+def writeXML(dateValue):
+    root = ET.Element("root")
+    doc = ET.SubElement(root, "doc")
+    ET.SubElement(doc, "lastDate", name="lastDate").text = dateValue
+    tree = ET.ElementTree(root)
+    tree.write("lastDateData.xml")
+
+def readDateFromXML(xmlFile):
+    tree = xml.etree.ElementTree.parse(xmlFile).getroot()
+    for child in tree.iter(tag='lastDate'):
+        return(child.text)
+
+def getMaxDateRow(rowsList):
+    maxDateIndex = 0
+    maxDate      = datetime.datetime(1970, 1, 1, 1, 1)
+    for row in rowsList:
+        if row[1] is not None:
+            print(row[1])
+            thisDate = getDateFromString(row[1])
+            if thisDate > maxDate:
+                maxDate = thisDate
+        maxDateIndex += 1
+
+    return rowsList[maxDateIndex - 1]
+
 
 def getDateFromString(dateString):
 
@@ -76,7 +104,8 @@ def main():
     if not values:
         print('No data found.')
     else:
-        return values
+        #return values
+        print(values)
 
 if __name__ == '__main__':
     main()

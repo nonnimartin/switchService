@@ -49,7 +49,6 @@ def getMaxDateRowUrl(rowsList):
     maxDate      = datetime.datetime(1970, 1, 1, 1, 1)
     for row in rowsList:
         if row[1] is not None:
-            print(row[1])
             thisDate = getDateFromString(row[1])
             if thisDate > maxDate:
                 maxDate = thisDate

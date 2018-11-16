@@ -56,6 +56,27 @@ def getMaxDateRowUrl(rowsList):
 
     return rowsList[maxDateIndex - 1][2]
 
+def getMaxDate(rowsList):
+    #cheap to process but could be refactored to process
+    #once for this and row url
+    maxDateIndex = 0
+    maxDate      = datetime.datetime(1970, 1, 1, 1, 1)
+    for row in rowsList:
+        if row[1] is not None:
+            thisDate = getDateFromString(row[1])
+            if thisDate > maxDate:
+                maxDate = thisDate
+        maxDateIndex += 1
+
+    return rowsList[maxDateIndex - 1][1]
+
+def getImageFromHTML(html):
+    soup = BeautifulSoup(html, "html.parser")
+    images = soup.find_all("img")
+    imagesLength = len(images)
+    #more than slightly hacky way of getting image url but
+    #no tag seems unique, and url seems to be reliably final element
+    return(images[imagesLength - 1]['src'])
 
 def getDateFromString(dateString):
 
@@ -103,8 +124,9 @@ def main():
     if not values:
         print('No data found.')
     else:
-        #return values
-        print(getHTML(getMaxDateRowUrl(values)))
+        #get image url and write to xml file the latest datetime
+        imageUrl     = getImageFromHTML(getHTML(getMaxDateRowUrl(values)))
+        writeXML(getMaxDate(values))
 
 if __name__ == '__main__':
     main()

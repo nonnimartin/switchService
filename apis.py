@@ -39,7 +39,7 @@ def writeXML(dateValue):
     tree = ET.ElementTree(root)
     tree.write("lastDateData.xml")
 
-def readDateFromXML(xmlFile):
+def getDateFromXML(xmlFile):
     tree = xml.etree.ElementTree.parse(xmlFile).getroot()
     for child in tree.iter(tag='lastDate'):
         return(child.text)
@@ -55,6 +55,12 @@ def getMaxDateRowUrl(rowsList):
         maxDateIndex += 1
 
     return rowsList[maxDateIndex - 1][2]
+
+def dateIsNew(maxDate, lastDate):
+    if lastDate == None:
+        return True
+    else:
+        return (maxDate > lastDate)
 
 def getMaxDate(rowsList):
     #cheap to process but could be refactored to process
@@ -79,6 +85,9 @@ def getImageFromHTML(html):
     return(images[imagesLength - 1]['src'])
 
 def getDateFromString(dateString):
+
+    if dateString == '' or dateString == None:
+        return None
 
     splitString = dateString.split(' ')
     month       = monthsMap[splitString[0]]
@@ -124,9 +133,17 @@ def main():
     if not values:
         print('No data found.')
     else:
-        #get image url and write to xml file the latest datetime
-        imageUrl     = getImageFromHTML(getHTML(getMaxDateRowUrl(values)))
-        writeXML(getMaxDate(values))
+
+        #get max date from google sheet
+        maxDate = getDateFromString(getMaxDate(values))
+        #get last date from xml file
+        lastDate = getDateFromString(getDateFromXML("lastDateData.xml"))
+
+        if dateIsNew(maxDate, lastDate):
+            # get image url and write to xml file the latest datetime
+            imageUrl = getImageFromHTML(getHTML(getMaxDateRowUrl(values)))
+            #write last date to xml file
+            writeXML(getMaxDate(values))
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,7 @@
 {
-  "name": "youtube2mp3",
+  "name": "switchService",
   "version": "1.0.0",
-  "description": "take youtube videos and return mp3",
+  "description": "Send images directly to phone via SMS",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nonnimartin/youtubeHlustsa.git"
+    "url": "git+https://github.com/nonnimartin/switchService"
   },
   "keywords": [
     "youtube",
@@ -19,21 +19,19 @@
   "author": "Jonathan Martin",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nonnimartin/youtubeHlustsa/issues"
+    "url": "https://github.com/nonnimartin/switchService/issues"
   },
-  "homepage": "https://github.com/nonnimartin/youtubeHlustsa#readme",
+  "homepage": "https://github.com/nonnimartin/switchService#readme",
   "devDependencies": {
     "nodemon": "^1.11.0"
   },
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
-    "fluent-ffmpeg": "^2.1.2",
-    "mongoose": "^4.11.0",
     "node-sms-send": "^0.1.3",
     "python-shell": "^1.0.6",
     "request": "^2.81.0",
-    "serve": "^6.0.1",
+    "serve": "^7.0.1",
     "ytdl-core": "^0.14.4"
   }
 }

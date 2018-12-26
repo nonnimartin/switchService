@@ -18,18 +18,21 @@ monthsMap = {
  'Oct': 10
  }
 
-def writeXML(dateValue):
-    root = ET.Element("root")
-    doc = ET.SubElement(root, "doc")
-    ET.SubElement(doc, "lastDate", name="lastDate").text = dateValue
-    tree = ET.ElementTree(root)
-    tree.write("lastDateData.xml")
+def writeJsonDate(dateValue):
+    lastDateMap             = {}
+    lastDateMap['lastDate'] = str(dateValue)
+    with open('lastDate.json', 'w') as outfile:
+        json.dump(lastDateMap, outfile)
+
+def getLastDate(jsonFile):
+    jsonFileStr = readFileToText(jsonFile)
+    return json.loads(jsonFileStr)['lastDate']
 
 def getAuthorizationMap(authFile):
 
     authMap = {}
-    file        = open(authFile, 'r')
-    jsonFile    = json.loads(file.read())
+    fileStr     = readFileToText(authFile)
+    jsonFile    = json.loads(fileStr)
     consumerKey = jsonFile['consumer_key']
     consumerSec = jsonFile['consumer_secret']
     oAuthKey    = jsonFile['oAuth_Key']
@@ -117,15 +120,35 @@ def getMostRecentTweet(tweetsMap):
     highestNum  = getHighestNumber(unixTimeSet)
     return tweetsMap[highestNum]
 
+def getMostRecentTweetDate(tweetsMap):
+    unixTimeSet = tweetsMap.keys()
+    highestNum  = getHighestNumber(unixTimeSet)
+    return highestNum
+
 def getHighestNumber(numSet):
     numSet.sort()
     size = len(numSet)
     return numSet[size - 1]
 
 def main():
-    tweetsMap = getLatestTweetsMap('TESTIFTTT3')
-    print getMostRecentTweet(tweetsMap)
+    configStr = readFileToText('config.json')
+    configMap = json.loads(configStr)
+    handle    = configMap['twitterHandle']
+    tweetsMap = getLatestTweetsMap(handle)
+    lastDate  = getLastDate('lastDate.json')
+    mostRecentDate = getMostRecentTweetDate(tweetsMap)
 
+    if lastDate == '':
+        writeJsonDate(getMostRecentTweetDate(tweetsMap))
+        print 'Result = ' + getMostRecentTweet(tweetsMap)
+        return getMostRecentTweet(tweetsMap)
+    elif mostRecentDate > lastDate:
+        writeJsonDate(getMostRecentTweetDate(tweetsMap))
+        print 'Result = ' + getMostRecentTweet(tweetsMap)
+        return getMostRecentTweet(tweetsMap)
+    else:
+        print 'Result = None'
+        return None
 
 if __name__ == '__main__':
     main()

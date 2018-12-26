@@ -26,12 +26,12 @@
     "nodemon": "^1.11.0"
   },
   "dependencies": {
+    "aws-sdk": "^2.381.0",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
-    "node-sms-send": "^0.1.3",
     "python-shell": "^1.0.6",
     "request": "^2.81.0",
-    "serve": "^7.0.1",
+    "serve": "^7.2.0",
     "ytdl-core": "^0.14.4"
   }
 }

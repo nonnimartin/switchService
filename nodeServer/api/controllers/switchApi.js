@@ -4,12 +4,11 @@ var fs         = require('fs');
 var https      = require('https');
 var url        = require('url');
 var request    = require('request');
-const serve    = require('serve');
 let {PythonShell} = require('python-shell')
 var globalResult;
-//const SMS      = require('node-sms-send')
-
-
+// Load the AWS SDK for Node.js
+var AWS = require('aws-sdk');
+AWS.config.loadFromPath('/Users/jonathanmartin/git/switchService/nodeServer/config.json');
 
 function runRequests(){
   setInterval(getTwitterImageUrl, 2000);
@@ -38,22 +37,34 @@ function getTwitterImageUrl() {
       console.log('result was null');
       globalResult = result;
     }else{
-      console.log('result was ' + result);
+      console.log('result was sent and ' + result);
       globalResult = result;
+      sendSMSToNumber('14129992684', result);
     }
     return result;
   }
   });
 }
 
-/*function sendSMSToNumber(phoneNumber, userName, password, message){
-  const sms = new SMS(userName, password);
-  sms.send(phoneNumber, message)
+function sendSMSToNumber(phoneNumber, message){
 
-  .then(body => console.log('body error message = ' + body)) // returns { message_id: 'string' }
-  .catch(err => console.log('error = ' + err.message))
-
-}*/
+    console.log('the message is = ' + message);
+    // Create publish parameters
+    var params = {
+      Message: message.toString(),
+      PhoneNumber: phoneNumber,
+    };
+    // Create promise and SNS service object
+    var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params).promise();
+    // Handle promise's fulfilled/rejected states
+    publishTextPromise.then(
+      function(data) {
+        console.log("MessageID is " + data.MessageId);
+      }).catch(
+        function(err) {
+        console.error(err, err.stack);
+    });
+}
 
 //REST API functions
 exports.run_test = function(req, res) {

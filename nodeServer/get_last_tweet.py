@@ -25,6 +25,22 @@ def writeXML(dateValue):
     tree = ET.ElementTree(root)
     tree.write("lastDateData.xml")
 
+def getAuthorizationMap(authFile):
+
+    authMap = {}
+    file        = open(authFile, 'r')
+    jsonFile    = json.loads(file.read())
+    consumerKey = jsonFile['consumer_key']
+    consumerSec = jsonFile['consumer_secret']
+    oAuthKey    = jsonFile['oAuth_Key']
+    oAuthSec    = jsonFile['oAuth_Secret']
+    authMap['consumerKey'] = consumerKey
+    authMap['consumerSec'] = consumerSec
+    authMap['oAuthKey']    = oAuthKey
+    authMap['oAuthSec']    = oAuthSec
+
+    return authMap
+
 def dateIsNew(maxDate, lastDate):
     if lastDate == None:
         return True
@@ -60,10 +76,11 @@ def getDateFromString(dateString):
 
     return time.mktime(datetime.datetime(year, month, day, hour, minutes, 0, 0).timetuple())
 
-def oauth_req(url, key, secret, http_method="GET", post_body="", http_headers=None):
-    consumer = oauth2.Consumer(key="vGqz0aJe0S69x22gYQ4fkgvCC", secret="wEBtMRRhNnavbKj4JQPNiss35zACWdOVjNfq9OP9HJFuYwMvUQ")
-    token = oauth2.Token(key=key, secret=secret)
-    client = oauth2.Client(consumer, token)
+def oauth_req(url, http_method="GET", post_body="", http_headers=None):
+    authMap  = getAuthorizationMap('auth.json')
+    consumer = oauth2.Consumer(key=authMap['consumerKey'], secret=authMap['consumerSec'])
+    token    = oauth2.Token(key=authMap['oAuthKey'], secret=authMap['oAuthSec'])
+    client   = oauth2.Client(consumer, token)
     resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
     return content
 
@@ -79,7 +96,11 @@ def convert_keys_to_string(dictionary):
         for k, v in dictionary.items())
 
 def getLatestTweetsMap(username):
-    tweetsJson = oauth_req('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' + username, '1025434286168498176-gvOsHsNFaLoZYQu4AdRgykq4R6eTGk', 'DRB6w75nRqZWn3jgUUvpY0kI86rvLeF32fvRqfBAnAKRl')
+    #
+    #MAKE SURE TO REMOVE THESE KEYS/AND RESET THEM BEFORE PUSHING TO GIT
+    #
+
+    tweetsJson = oauth_req('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' + username)
     tweetsList = json.loads(tweetsJson)
 
     tweetsListConverted = convert_keys_to_string(tweetsList)

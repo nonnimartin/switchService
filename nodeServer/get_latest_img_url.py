@@ -130,6 +130,8 @@ def main():
                                 range=SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
 
+    print(values)
+
     if not values:
         print('No data found.')
     else:

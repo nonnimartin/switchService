@@ -4,11 +4,16 @@ var fs         = require('fs');
 var https      = require('https');
 var url        = require('url');
 var request    = require('request');
-let {PythonShell} = require('python-shell')
+var {PythonShell} = require('python-shell')
+var resolve = require('path').resolve
 var globalResult;
+
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
-AWS.config.loadFromPath('/Users/jonathanmartin/git/switchService/nodeServer/config.json');
+
+//get absolute path for config file
+var filePath = resolve('./config.json');
+AWS.config.loadFromPath(filePath);
 
 function runRequests(){
   setInterval(getTwitterImageUrl, 2000);
@@ -24,12 +29,21 @@ exports.startRequests = function(req,res){
 
 function getTwitterImageUrl() {
 
-  let options = {
+  var filePath = resolve('./config.json');
+  var configMap;
+
+  fs.readFile(filePath, 'utf8', function (err, data) {
+      if (err) throw err;
+         configMap = JSON.parse(data);
+         console.log('config map = ' + configMap.phoneNumber);
+  });
+
+  var options = {
   mode: 'text',
   pythonPath: '/usr/local/bin/python'
   };
 
-  PythonShell.run('get_latest_img_url.py', options, function (err, result) {
+  PythonShell.run('get_last_tweet.py', options, function (err, result) {
   if (err){
     throw err;
   }else{

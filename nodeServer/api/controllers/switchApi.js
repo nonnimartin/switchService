@@ -39,7 +39,7 @@ function getTwitterImageUrl() {
     }else{
       console.log('result was sent and ' + result);
       globalResult = result;
-      sendSMSToNumber('14129992684', result);
+      sendSMSToNumber('', result);
     }
     return result;
   }

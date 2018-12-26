@@ -25,8 +25,14 @@ def writeJsonDate(dateValue):
         json.dump(lastDateMap, outfile)
 
 def getLastDate(jsonFile):
+
     jsonFileStr = readFileToText(jsonFile)
-    return json.loads(jsonFileStr)['lastDate']
+    lastDate = json.loads(jsonFileStr)['lastDate']
+
+    if lastDate == '':
+        return 0
+    else:
+        return int(lastDate)
 
 def getAuthorizationMap(authFile):
 
@@ -135,8 +141,8 @@ def main():
     configMap = json.loads(configStr)
     handle    = configMap['twitterHandle']
     tweetsMap = getLatestTweetsMap(handle)
-    lastDate  = int(getLastDate('lastDate.json'))
-    mostRecentDate = int(getMostRecentTweetDate(tweetsMap))
+    lastDate  = getLastDate('lastDate.json')
+    mostRecentDate = getMostRecentTweetDate(tweetsMap)
 
     if lastDate == '':
         writeJsonDate(getMostRecentTweetDate(tweetsMap))

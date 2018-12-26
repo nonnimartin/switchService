@@ -70,7 +70,7 @@ def getDateFromString(dateString):
     month       = monthsMap[splitString[1]]
     day         = int(splitString[2])
     year        = int(splitString[5])
-    timeStr        = splitString[3]
+    timeStr     = splitString[3]
     hour        = int(timeStr.split(':')[0])
     minutes     = int(timeStr.split(':')[1])
 

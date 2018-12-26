@@ -7,6 +7,7 @@ var request    = require('request');
 var {PythonShell} = require('python-shell')
 var resolve = require('path').resolve
 var globalResult;
+var isRunning  = false;
 
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
@@ -16,7 +17,7 @@ var filePath = resolve('./config.json');
 AWS.config.loadFromPath(filePath);
 
 function runRequests(){
-  setInterval(getTwitterImageUrl, 2000);
+  setInterval(getTwitterImageUrl, 10000);
 }
 
 function stopRequests(){
@@ -29,40 +30,43 @@ exports.startRequests = function(req,res){
 
 function getTwitterImageUrl() {
 
-  var filePath = resolve('./config.json');
-  var configMap;
+  if (!isRunning) {
+      isRunning    = true;
+      var filePath = resolve('./config.json');
+      var configMap;
 
-  fs.readFile(filePath, 'utf8', function (err, data) {
-      if (err) throw err;
-         configMap = JSON.parse(data);
-         console.log('config map = ' + configMap.phoneNumber);
-  });
+      fs.readFile(filePath, 'utf8', function (err, data) {
+          if (err) throw err;
+             configMap = JSON.parse(data);
+      });
 
-  var options = {
-  mode: 'text',
-  pythonPath: '/usr/local/bin/python'
-  };
+      var options = {
+      mode: 'text',
+      pythonPath: '/usr/local/bin/python'
+      };
 
-  PythonShell.run('get_last_tweet.py', options, function (err, result) {
-  if (err){
-    throw err;
-  }else{
-    if (result == null || result == 'null'){
-      console.log('result was null');
-      globalResult = result;
-    }else{
-      console.log('result was sent and ' + result);
-      globalResult = result;
-      sendSMSToNumber('', result);
-    }
-    return result;
+      PythonShell.run('get_last_tweet.py', options, function (err, result) {
+      if (err){
+        throw err;
+      }else{
+        console.log('result = ' + result);
+        if (result == 'None' || result == null){
+          console.log('Result was None');
+          globalResult = result;
+        }else{
+          console.log('Result was sent and ' + result);
+          globalResult = result;
+          sendSMSToNumber(configMap.phoneNumber, result);
+        }
+        isRunning = false;
+        return result;
+      }
+    });
   }
-  });
 }
 
 function sendSMSToNumber(phoneNumber, message){
 
-    console.log('the message is = ' + message);
     // Create publish parameters
     var params = {
       Message: message.toString(),

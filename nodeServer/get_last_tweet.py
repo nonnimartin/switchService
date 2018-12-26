@@ -135,20 +135,17 @@ def main():
     configMap = json.loads(configStr)
     handle    = configMap['twitterHandle']
     tweetsMap = getLatestTweetsMap(handle)
-    lastDate  = getLastDate('lastDate.json')
-    mostRecentDate = getMostRecentTweetDate(tweetsMap)
+    lastDate  = int(getLastDate('lastDate.json'))
+    mostRecentDate = int(getMostRecentTweetDate(tweetsMap))
 
     if lastDate == '':
         writeJsonDate(getMostRecentTweetDate(tweetsMap))
-        print 'Result = ' + getMostRecentTweet(tweetsMap)
-        return getMostRecentTweet(tweetsMap)
+        print getMostRecentTweet(tweetsMap)
     elif mostRecentDate > lastDate:
         writeJsonDate(getMostRecentTweetDate(tweetsMap))
-        print 'Result = ' + getMostRecentTweet(tweetsMap)
-        return getMostRecentTweet(tweetsMap)
+        print getMostRecentTweet(tweetsMap)
     else:
-        print 'Result = None'
-        return None
+        print 'None'
 
 if __name__ == '__main__':
     main()

@@ -96,9 +96,6 @@ def convert_keys_to_string(dictionary):
         for k, v in dictionary.items())
 
 def getLatestTweetsMap(username):
-    #
-    #MAKE SURE TO REMOVE THESE KEYS/AND RESET THEM BEFORE PUSHING TO GIT
-    #
 
     tweetsJson = oauth_req('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' + username)
     tweetsList = json.loads(tweetsJson)

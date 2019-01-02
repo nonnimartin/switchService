@@ -22,7 +22,7 @@ monthsMap = {
 def writeJsonDate(dateValue, handle):
     jsonFileStr               = readFileToText('lastDate.json')
     lastHandleDateMap         = json.loads(jsonFileStr)
-    newLastDateMap            = {'lastDate' : dateValue}
+    newLastDateMap            = {'lastDate' : str(dateValue)}
     lastHandleDateMap[handle] = newLastDateMap
 
     with open('lastDate.json', 'w') as outfile:

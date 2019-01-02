@@ -2,6 +2,7 @@ import oauth2
 import json
 import datetime
 import time
+import sys
 
 monthsMap = {
  'Mar': 3,
@@ -18,16 +19,20 @@ monthsMap = {
  'Oct': 10
  }
 
-def writeJsonDate(dateValue):
-    lastDateMap             = {}
-    lastDateMap['lastDate'] = str(dateValue)
-    with open('lastDate.json', 'w') as outfile:
-        json.dump(lastDateMap, outfile)
+def writeJsonDate(dateValue, handle):
+    jsonFileStr               = readFileToText('lastDate.json')
+    lastHandleDateMap         = json.loads(jsonFileStr)
+    newLastDateMap            = {'lastDate' : dateValue}
+    lastHandleDateMap[handle] = newLastDateMap
 
-def getLastDate(jsonFile):
+    with open('lastDate.json', 'w') as outfile:
+        json.dump(lastHandleDateMap, outfile)
+
+def getLastDate(jsonFile, handle):
 
     jsonFileStr = readFileToText(jsonFile)
-    lastDate = json.loads(jsonFileStr)['lastDate']
+    record      = json.loads(jsonFileStr)[handle]
+    lastDate    = record['lastDate']
 
     if lastDate == '':
         return 0
@@ -137,18 +142,18 @@ def getHighestNumber(numSet):
     return numSet[size - 1]
 
 def main():
-    configStr = readFileToText('config.json')
-    configMap = json.loads(configStr)
-    handle    = configMap['twitterHandle']
+
+    handle = sys.argv[1]
     tweetsMap = getLatestTweetsMap(handle)
-    lastDate  = getLastDate('lastDate.json')
+    lastDate  = getLastDate('lastDate.json', handle)
     mostRecentDate = getMostRecentTweetDate(tweetsMap)
 
     if lastDate == '':
-        writeJsonDate(getMostRecentTweetDate(tweetsMap))
+        writeJsonDate(getMostRecentTweetDate(tweetsMap), handle)
+        getMostRecentTweet(tweetsMap)
         print getMostRecentTweet(tweetsMap)
     elif mostRecentDate > lastDate:
-        writeJsonDate(getMostRecentTweetDate(tweetsMap))
+        writeJsonDate(getMostRecentTweetDate(tweetsMap), handle)
         print getMostRecentTweet(tweetsMap)
     else:
         print 'None'

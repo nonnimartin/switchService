@@ -6,7 +6,6 @@ var url        = require('url');
 var request    = require('request');
 var {PythonShell} = require('python-shell')
 var resolve = require('path').resolve
-var globalResult;
 var isRunning  = false;
 
 // Load the AWS SDK for Node.js
@@ -17,7 +16,7 @@ var filePath = resolve('./config.json');
 AWS.config.loadFromPath(filePath);
 
 function runRequests(){
-  setInterval(getTwitterImageUrl, 10000);
+  setInterval(getTwitterImageUrl, 1000);
 }
 
 function stopRequests(){
@@ -35,34 +34,58 @@ function getTwitterImageUrl() {
       var filePath = resolve('./config.json');
       var configMap;
 
+      //get absolute path for config file
+      var filePath      = resolve('./config.json');
+      var subscriptions = resolve('./subscriptions.json');
+
+      //read config file to map
       fs.readFile(filePath, 'utf8', function (err, data) {
           if (err) throw err;
-             configMap = JSON.parse(data);
+             configMap       = JSON.parse(data);
       });
 
-      var options = {
-      mode: 'text',
-      pythonPath: '/usr/local/bin/python'
-      };
+      //read subs file to map
+      fs.readFile(subscriptions, 'utf8', function (err, data) {
+          if (err) throw err;
 
-      PythonShell.run('get_last_tweet.py', options, function (err, result) {
-      if (err){
-        throw err;
-      }else{
-        console.log('result = ' + result);
-        if (result == 'None' || result == null){
-          console.log('Result was None');
-          globalResult = result;
-        }else{
-          console.log('Result was sent and ' + result);
-          globalResult = result;
-          sendSMSToNumber(configMap.phoneNumber, result);
+              var subsMap = JSON.parse(data);
+              var keySet  = Object.keys(subsMap);
+
+              for (var i in keySet){
+
+               let options = {
+                mode: 'text',
+                pythonPath: '/usr/local/bin/python',
+                args: []
+                };
+                
+                var subKey      = keySet[i];
+                var handle      = subKey;
+                var thisSub     = subsMap[handle];
+                var phoneNumber = thisSub["phoneNumber"];
+                var argsList    = options.args;
+
+                argsList.push(handle);
+                options['args']    = argsList;
+
+                PythonShell.run('get_last_tweet.py', options, function (err, result) {
+                  console.log('running for sub: ' + JSON.stringify(options));
+                  if (err){
+                    throw err;
+                  }else{
+                    if (result == 'None' || result == null){
+                      console.log('Do nothing');
+                    }else{
+                      console.log('result = ' + result);
+                      sendSMSToNumber(phoneNumber, result);
+                    }
+                    isRunning = false;
+                    return result;
+                  }
+                });
+              }
+              });
         }
-        isRunning = false;
-        return result;
-      }
-    });
-  }
 }
 
 function sendSMSToNumber(phoneNumber, message){

@@ -76,9 +76,7 @@ function getTwitterImageUrl() {
                     if (result == 'None' || result == null){
                       console.log('Do nothing');
                     }else{
-                      console.log('result = ' + result);
-                      console.log('phone number = ' + phoneNumber)
-                      //sendSMSToNumber(phoneNumber, result);
+                      sendSMSToNumber(phoneNumber, result);
                     }
                     isRunning = false;
                     return result;

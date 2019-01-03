@@ -62,7 +62,7 @@ function getTwitterImageUrl() {
                 var subKey      = keySet[i];
                 var handle      = subKey;
                 var thisSub     = subsMap[handle];
-                var phoneNumber = thisSub["phoneNumber"];
+                let phoneNumber = thisSub["phoneNumber"];
                 var argsList    = options.args;
 
                 argsList.push(handle);
@@ -77,7 +77,8 @@ function getTwitterImageUrl() {
                       console.log('Do nothing');
                     }else{
                       console.log('result = ' + result);
-                      sendSMSToNumber(phoneNumber, result);
+                      console.log('phone number = ' + phoneNumber)
+                      //sendSMSToNumber(phoneNumber, result);
                     }
                     isRunning = false;
                     return result;

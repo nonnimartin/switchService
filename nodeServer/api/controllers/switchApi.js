@@ -23,6 +23,10 @@ function stopRequests(){
   clearInterval(getTwitterImageUrl);
 }
 
+function getLastDatesMap(){
+    return JSON.parse(fs.readFileSync('./lastDate.json', 'utf8'));
+}
+
 exports.startRequests = function(req,res){
   runRequests();
 }
@@ -35,13 +39,15 @@ function getTwitterImageUrl() {
       var configMap;
 
       //get absolute path for config file
-      var filePath      = resolve('./config.json');
-      var subscriptions = resolve('./subscriptions.json');
+      var filePath        = resolve('./config.json');
+      var subscriptions   = resolve('./subscriptions.json');
+      let lastDatesMap    = getLastDatesMap();
+      let lastDateHandles = Object.keys(lastDatesMap);
 
       //read config file to map
       fs.readFile(filePath, 'utf8', function (err, data) {
           if (err) throw err;
-             configMap       = JSON.parse(data);
+             configMap = JSON.parse(data);
       });
 
       //read subs file to map
@@ -49,13 +55,22 @@ function getTwitterImageUrl() {
           if (err) throw err;
 
               var subsMap = JSON.parse(data);
+
+              //if any subscription username/handle is not in the lasatDate record, initialize one
+              //with a unix epoch of 0
+              for (let handle in subsMap){
+                 if (!(handle in lastDateHandles)){
+                     //populate the lastdate.json with new user record
+                 }
+              }
+              
               var keySet  = Object.keys(subsMap);
 
               for (var i in keySet){
 
                let options = {
                 mode: 'text',
-                pythonPath: '/usr/local/bin/python',
+                pythonPath: '/Library/Frameworks/Python.framework/Versions/2.7/bin/python',
                 args: []
                 };
                 

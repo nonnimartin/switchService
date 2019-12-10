@@ -55,22 +55,13 @@ function getTwitterImageUrl() {
           if (err) throw err;
 
               var subsMap = JSON.parse(data);
-
-              //if any subscription username/handle is not in the lasatDate record, initialize one
-              //with a unix epoch of 0
-              for (let handle in subsMap){
-                 if (!(handle in lastDateHandles)){
-                     //populate the lastdate.json with new user record
-                 }
-              }
-              
               var keySet  = Object.keys(subsMap);
 
               for (var i in keySet){
 
                let options = {
                 mode: 'text',
-                pythonPath: '/Library/Frameworks/Python.framework/Versions/2.7/bin/python',
+                pythonPath: '/usr/bin/python2',
                 args: []
                 };
                 

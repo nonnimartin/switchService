@@ -61,7 +61,7 @@ function getTwitterImageUrl() {
 
                let options = {
                 mode: 'text',
-                pythonPath: '/usr/bin/python2',
+                pythonPath: '/usr/bin/python',
                 args: []
                 };
                 

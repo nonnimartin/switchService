@@ -23,6 +23,10 @@ function stopRequests(){
   clearInterval(getTwitterImageUrl);
 }
 
+function getLastDatesMap(){
+    return JSON.parse(fs.readFileSync('./lastDate.json', 'utf8'));
+}
+
 exports.startRequests = function(req,res){
   runRequests();
 }
@@ -35,13 +39,15 @@ function getTwitterImageUrl() {
       var configMap;
 
       //get absolute path for config file
-      var filePath      = resolve('./config.json');
-      var subscriptions = resolve('./subscriptions.json');
+      var filePath        = resolve('./config.json');
+      var subscriptions   = resolve('./subscriptions.json');
+      let lastDatesMap    = getLastDatesMap();
+      let lastDateHandles = Object.keys(lastDatesMap);
 
       //read config file to map
       fs.readFile(filePath, 'utf8', function (err, data) {
           if (err) throw err;
-             configMap       = JSON.parse(data);
+             configMap = JSON.parse(data);
       });
 
       //read subs file to map
@@ -55,7 +61,7 @@ function getTwitterImageUrl() {
 
                let options = {
                 mode: 'text',
-                pythonPath: '/usr/local/bin/python',
+                pythonPath: '/usr/bin/python',
                 args: []
                 };
                 

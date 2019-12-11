@@ -31,8 +31,16 @@ def writeJsonDate(dateValue, handle):
 def getLastDate(jsonFile, handle):
 
     jsonFileStr = readFileToText(jsonFile)
-    record      = json.loads(jsonFileStr)[handle]
-    lastDate    = record['lastDate']
+    lastDate    = json.loads(jsonFileStr)
+
+    if handle in lastDate.keys():
+        record      = lastDate[handle]
+        lastDate    = record['lastDate']
+    else:
+        writeJsonDate(0, handle)
+        # random early date
+        lastDate    = '1559436480'
+        
 
     if lastDate == '':
         return 0
@@ -95,7 +103,7 @@ def oauth_req(url, http_method="GET", post_body="", http_headers=None):
     consumer = oauth2.Consumer(key=authMap['consumerKey'], secret=authMap['consumerSec'])
     token    = oauth2.Token(key=authMap['oAuthKey'], secret=authMap['oAuthSec'])
     client   = oauth2.Client(consumer, token)
-    resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
+    resp, content = client.request(url, method=http_method, body=post_body, headers=http_headers )
     return content
 
 def readFileToText(filePath):
@@ -118,11 +126,14 @@ def getLatestTweetsMap(username):
     tweetsMap  = {}
 
     for tweet in tweetsListConverted:
-        dateKey     = str(tweet['created_at'])
-        dateKeyUnix = int(getDateFromString(dateKey))
-        thisMap     = convert_keys_to_string(tweet['entities'])
-        if 'media' in thisMap.keys():
-            tweetsMap[dateKeyUnix] = str(thisMap['media'][0]['media_url_https'])
+        try:
+            dateKey     = str(tweet['created_at'])
+            dateKeyUnix = int(getDateFromString(dateKey))
+            thisMap     = convert_keys_to_string(tweet['entities'])
+            if 'media' in thisMap.keys():
+                tweetsMap[dateKeyUnix] = str(thisMap['media'][0]['media_url_https'])
+        except:
+            continue
 
     return tweetsMap
 
@@ -139,24 +150,36 @@ def getMostRecentTweetDate(tweetsMap):
 def getHighestNumber(numSet):
     numSet.sort()
     size = len(numSet)
-    return numSet[size - 1]
+    if size > 0:
+        return numSet[size - 1]
+    else:
+        return 0
 
 def main():
 
-    handle = sys.argv[1]
-    tweetsMap = getLatestTweetsMap(handle)
-    lastDate  = getLastDate('lastDate.json', handle)
-    mostRecentDate = getMostRecentTweetDate(tweetsMap)
+        handle    = sys.argv[1]
+        if isinstance(handle, str):
+            tweetsMap = getLatestTweetsMap(handle)
+            lastDate  = getLastDate('lastDate.json', handle)
+            mostRecentDate = getMostRecentTweetDate(tweetsMap)
 
-    if lastDate == '':
-        writeJsonDate(getMostRecentTweetDate(tweetsMap), handle)
-        getMostRecentTweet(tweetsMap)
-        print getMostRecentTweet(tweetsMap)
-    elif mostRecentDate > lastDate:
-        writeJsonDate(getMostRecentTweetDate(tweetsMap), handle)
-        print getMostRecentTweet(tweetsMap)
-    else:
-        print 'None'
+            if lastDate == '':
+                writeJsonDate(getMostRecentTweetDate(tweetsMap), handle)
+                getMostRecentTweet(tweetsMap)
+                print(getMostRecentTweet(tweetsMap))
+            elif lastDate == 0:
+                # cover case where new subscription was created
+                # don't send any SMS
+                print('None')
+            elif mostRecentDate > lastDate:
+                writeJsonDate(getMostRecentTweetDate(tweetsMap), handle)
+                print(getMostRecentTweet(tweetsMap))
+            else:
+                print('None')
+        else:
+            print('None')
+
+
 
 if __name__ == '__main__':
     main()

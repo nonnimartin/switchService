@@ -38,7 +38,8 @@ def getLastDate(jsonFile, handle):
         lastDate    = record['lastDate']
     else:
         writeJsonDate(0, handle)
-        lastDate    = ''
+        # random early date
+        lastDate    = '1559436480'
         
 
     if lastDate == '':

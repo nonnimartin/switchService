@@ -48,7 +48,6 @@ function getTwitterImageUrl() {
       fs.readFile(filePath, 'utf8', function (err, data) {
           if (err) throw err;
              configMap = JSON.parse(data);
-             console.log(configMap);
       });
 
       //read subs file to map

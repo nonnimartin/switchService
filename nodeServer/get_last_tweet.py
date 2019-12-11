@@ -126,11 +126,14 @@ def getLatestTweetsMap(username):
     tweetsMap  = {}
 
     for tweet in tweetsListConverted:
-        dateKey     = str(tweet['created_at'])
-        dateKeyUnix = int(getDateFromString(dateKey))
-        thisMap     = convert_keys_to_string(tweet['entities'])
-        if 'media' in thisMap.keys():
-            tweetsMap[dateKeyUnix] = str(thisMap['media'][0]['media_url_https'])
+        try:
+            dateKey     = str(tweet['created_at'])
+            dateKeyUnix = int(getDateFromString(dateKey))
+            thisMap     = convert_keys_to_string(tweet['entities'])
+            if 'media' in thisMap.keys():
+                tweetsMap[dateKeyUnix] = str(thisMap['media'][0]['media_url_https'])
+        except:
+            continue
 
     return tweetsMap
 
